@@ -243,12 +243,15 @@ struct ContentView: View {
                 .tabItem {
                     Label("Temps", systemImage: "thermometer")
                 }
-            
             SettingsView(viewModel: viewModel)
                 .tabItem {
-                    Label("Settings", systemImage: "gear")
+                Label("Settings", systemImage: "gear")
                 }
-        }
+            TemperatureQuiltView(viewModel: viewModel) // New tab for Temperature Quilt
+                .tabItem {
+                    Label("Quilt", systemImage: "square.fill")
+                }
+            }
     }
 }
     
