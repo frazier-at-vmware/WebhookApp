@@ -129,7 +129,7 @@ struct TemperatureRecordsView: View {
         .frame(maxHeight: .infinity)
         .padding()
         .background(Color(backgroundColor(for: record.temp)))
-  
+        
     }
     
     private func temperatureRow(for record: TemperatureRecord) -> some View {
@@ -141,7 +141,7 @@ struct TemperatureRecordsView: View {
                     .padding(.trailing, 4)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
-
+            
             Text(viewModel.formatDate(record.datetime))
                 .font(.body)
             
@@ -153,78 +153,78 @@ struct TemperatureRecordsView: View {
                 .background(RoundedRectangle(cornerRadius: 10).fill(backgroundColor(for: record.temp)))
         }
     }
-
-
-struct SettingsView: View {
-    @ObservedObject var viewModel: AppViewModel
-
-    var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Location Settings")) {
-                    TextField("Zip Code", text: $viewModel.zipCode)
-                        .keyboardType(.numberPad)
+    
+    
+    struct SettingsView: View {
+        @ObservedObject var viewModel: AppViewModel
+        
+        var body: some View {
+            NavigationView {
+                Form {
+                    Section(header: Text("Location Settings")) {
+                        TextField("Zip Code", text: $viewModel.zipCode)
+                            .keyboardType(.numberPad)
+                        
+                        Button("Refresh") {
+                            viewModel.fetchTemperatures()
+                        }
+                    }
                     
-                    Button("Refresh") {
-                        viewModel.fetchTemperatures()
-                    }
-                }
-                
-                Section(header: Text("Temperature Color Ranges")) {
-                    ForEach($viewModel.temperatureColorPreference.ranges) { $range in
-                        HStack {
-                            TextField("Lower Bound", value: $range.lowerBound, formatter: NumberFormatter())
-                            TextField("Upper Bound", value: $range.upperBound, formatter: NumberFormatter())
-                            ColorPicker("", selection: $range.color)
+                    Section(header: Text("Temperature Color Ranges")) {
+                        ForEach($viewModel.temperatureColorPreference.ranges) { $range in
+                            HStack {
+                                TextField("Lower Bound", value: $range.lowerBound, formatter: NumberFormatter())
+                                TextField("Upper Bound", value: $range.upperBound, formatter: NumberFormatter())
+                                ColorPicker("", selection: $range.color)
+                            }
+                        }
+                        .onDelete(perform: deleteRange)
+                        .onMove(perform: moveRange)
+                        
+                        Button("Add Range") {
+                            withAnimation {
+                                viewModel.temperatureColorPreference.ranges.append(TemperatureRange(lowerBound: 0, upperBound: 10, color: .white))
+                            }
                         }
                     }
-                    .onDelete(perform: deleteRange)
-                    .onMove(perform: moveRange)
                     
-                    Button("Add Range") {
-                        withAnimation {
-                            viewModel.temperatureColorPreference.ranges.append(TemperatureRange(lowerBound: 0, upperBound: 10, color: .white))
-                        }
+                    Section(header: Text("Knitting Settings")) {
+                        Toggle("Show Knit/Pearl Suggestions", isOn: $viewModel.showKPTextBlock)
                     }
-                }
-                
-                Section(header: Text("Knitting Settings")) {
-                    Toggle("Show Knit/Pearl Suggestions", isOn: $viewModel.showKPTextBlock)
-                }
-                
-                Section(header: Text("Notification Settings")) {
-                    DatePicker("Reminder Time", selection: $viewModel.reminderTime, displayedComponents: .hourAndMinute)
-                        .onChange(of: viewModel.reminderTime) { newValue in
-                            viewModel.scheduleReminder()
-                        }
-                    Button("Request Push Notifications") {
-                        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
-                            if success {
-                                print("All set!")
-                            } else if let error {
-                                print(error.localizedDescription)
+                    
+                    Section(header: Text("Notification Settings")) {
+                        DatePicker("Reminder Time", selection: $viewModel.reminderTime, displayedComponents: .hourAndMinute)
+                            .onChange(of: viewModel.reminderTime) { newValue in
+                                viewModel.scheduleReminder()
+                            }
+                        Button("Request Push Notifications") {
+                            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
+                                if success {
+                                    print("All set!")
+                                } else if let error {
+                                    print(error.localizedDescription)
+                                }
                             }
                         }
                     }
                 }
+                .navigationTitle("Settings")
+                .toolbar {
+                    EditButton()
+                }
             }
-            .navigationTitle("Settings")
-            .toolbar {
-                EditButton()
-            }
+        }
+        
+        private func deleteRange(at offsets: IndexSet) {
+            viewModel.temperatureColorPreference.ranges.remove(atOffsets: offsets)
+        }
+        
+        private func moveRange(from source: IndexSet, to destination: Int) {
+            viewModel.temperatureColorPreference.ranges.move(fromOffsets: source, toOffset: destination)
         }
     }
     
-    private func deleteRange(at offsets: IndexSet) {
-        viewModel.temperatureColorPreference.ranges.remove(atOffsets: offsets)
-    }
-    
-    private func moveRange(from source: IndexSet, to destination: Int) {
-        viewModel.temperatureColorPreference.ranges.move(fromOffsets: source, toOffset: destination)
-    }
 }
-
-
 struct ContentView: View {
     @StateObject private var viewModel = AppViewModel()
     
@@ -240,22 +240,23 @@ struct ContentView: View {
                     Label("Settings", systemImage: "gear")
                 }
         }
-                }
-    }
-
-struct TemperatureRecord: Decodable, Identifiable {
-    var id: Int
-    var zip: Int
-    var datetime: String
-    var temp: Double
-
-    enum CodingKeys: String, CodingKey {
-        case id = "Id"
-        case zip
-        case datetime
-        case temp
     }
 }
+    
+    struct TemperatureRecord: Decodable, Identifiable {
+        var id: Int
+        var zip: Int
+        var datetime: String
+        var temp: Double
+        
+        enum CodingKeys: String, CodingKey {
+            case id = "Id"
+            case zip
+            case datetime
+            case temp
+        }
+    }
+
 
 extension DateFormatter {
     static let yearMonthDay: DateFormatter = {
