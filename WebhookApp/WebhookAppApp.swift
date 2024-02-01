@@ -90,12 +90,12 @@ struct TemperatureRecordsView: View {
         NavigationView {
             List {
                 if let mostRecentRecord = viewModel.temperatures.last {
-                    Section(header: Text("Latest")) {
+                    Section(header: Text("Today")) {
                         temperatureCard(for: mostRecentRecord)
                     }
                 }
                 
-                Section(header: Text("History")) {
+                Section(header: Text("Historical Temperatures")) {
                     ForEach(viewModel.temperatures, id: \.id) { record in
                         temperatureRow(for: record)
                     }
@@ -120,8 +120,17 @@ struct TemperatureRecordsView: View {
     
     private func temperatureCard(for record: TemperatureRecord) -> some View {
         VStack(alignment: .leading) {
-            Text(viewModel.formatDate(record.datetime))
-                .font(.headline)
+            HStack {
+                if viewModel.showKPTextBlock {
+                    Text(viewModel.letterForDate(record.datetime))
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .padding(.trailing, 4)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                Text(viewModel.formatDate(record.datetime))
+                    .font(.headline)
+            }
             Text("\(record.temp, specifier: "%.1f")°F")
                 .font(.subheadline)
         }
@@ -129,7 +138,6 @@ struct TemperatureRecordsView: View {
         .frame(maxHeight: .infinity)
         .padding()
         .background(Color(backgroundColor(for: record.temp)))
-        
     }
     
     private func temperatureRow(for record: TemperatureRecord) -> some View {
