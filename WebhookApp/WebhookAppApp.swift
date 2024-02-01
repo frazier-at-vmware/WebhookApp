@@ -27,7 +27,7 @@ class AppViewModel: ObservableObject {
         var upperBound: Double
         var color: Color
     }
-    }
+    
 
     func fetchTemperatures() {
         isLoading = true
