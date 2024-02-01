@@ -124,27 +124,30 @@ struct TemperatureRecordsView: View {
     }
     
     private func temperatureCard(for record: TemperatureRecord) -> some View {
-        VStack(alignment: .leading) {
-            HStack {
-                if viewModel.showKPTextBlock {
-                    Text(viewModel.letterForDate(record.datetime))
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .padding(.trailing, 4)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+        HStack {
+            Image(systemName: "thermometer")
+                .foregroundColor(viewModel.backgroundColor(for: record.temp)) // Change color based on temperature
+                .scaledToFit()
+            VStack(alignment: .leading) {
+                HStack {
+                    if viewModel.showKPTextBlock {
+                        Text(viewModel.letterForDate(record.datetime))
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .padding(.trailing, 4)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+                    Text(viewModel.formatDate(record.datetime))
+                        .font(.headline)
                 }
-                Text(viewModel.formatDate(record.datetime))
-                    .font(.headline)
+                Text("\(record.temp, specifier: "%.1f")°F")
+                    .font(.subheadline)
             }
-            Text("\(record.temp, specifier: "%.1f")°F")
-                .font(.subheadline)
+            .frame(maxWidth: .infinity) // Fill the VStack horizontally
+            .frame(maxHeight: .infinity)
+            .padding()
         }
-        .frame(maxWidth: .infinity) // Fill the VStack horizontally
-        .frame(maxHeight: .infinity)
-        .padding()
-        .background(Color(viewModel.backgroundColor(for: record.temp)))
     }
-    
     private func temperatureRow(for record: TemperatureRecord) -> some View {
         HStack {
             if viewModel.showKPTextBlock {
@@ -251,7 +254,7 @@ struct TemperatureQuiltView: View {
                 }
             }
         }
-        .navigationTitle("Temperature Quilt")
+        .navigationTitle("Temperature Blanket")
     }
 }
 
@@ -270,7 +273,7 @@ struct ContentView: View {
                 }
             TemperatureQuiltView(temperatureColorPreference: viewModel.temperatureColorPreference, viewModel: viewModel) // New tab for Temperature Quilt
                 .tabItem {
-                    Label("Quilt", systemImage: "square.fill")
+                    Label("Blanket", systemImage: "square.fill")
                 }
             }
     }
