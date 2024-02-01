@@ -8,7 +8,7 @@ class TemperatureService {
     
 
     func fetchTemperatures(forZip zipCode: String, completion: @escaping (Result<[TemperatureRecord], AFError>) -> Void) {
-        let urlString = "https://db.blanketbuddy.app/api/v2/tables/mc1rg3em8tzigqr/records?viewId=vwb8k4qgarb7brlt&limit=365&shuffle=0&offset=0"
+        let urlString = "https://db.blanketbuddy.app/api/v2/tables/mc1rg3em8tzigqr/records?where=%3D%28zip%2Ceq%2C\(zipCode)%29&limit=365&shuffle=0&offset=0"
         let headers: HTTPHeaders = [
             "accept": "application/json",
             "xc-token": "P5IzMC16RC0FJ6G1PYJDD6JYi_CRPtJ23ILa6OFN"
