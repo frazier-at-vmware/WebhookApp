@@ -190,8 +190,8 @@ struct SettingsView: View {
                     ColorPicker("90-100+", selection: $viewModel.temperatureColorPreference.ninetyToHundred)
                 
                 }
-                Section(header: Text("Display Settings")) {
-                    Toggle("Show K/P Text Block", isOn: $viewModel.showKPTextBlock)
+                Section(header: Text("Knitting Settings")) {
+                    Toggle("Show Knit/Pearl Suggestions", isOn: $viewModel.showKPTextBlock)
                 }
                 Section(header: Text("Notification Settings")) {
                     DatePicker("Reminder Time", selection: $viewModel.reminderTime, displayedComponents: .hourAndMinute)
