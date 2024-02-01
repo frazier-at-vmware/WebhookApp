@@ -183,7 +183,7 @@ struct TemperatureRecordsView: View {
                         
                         Button("Add Range") {
                             withAnimation {
-                                viewModel.temperatureColorPreference.ranges.append(TemperatureRange(lowerBound: 0, upperBound: 10, color: .white))
+                                viewModel.temperatureColorPreference.ranges.append(AppViewModel.TemperatureRange(lowerBound: 0, upperBound: 10, color: .white))
                             }
                         }
                     }
@@ -225,6 +225,7 @@ struct TemperatureRecordsView: View {
     }
     
 }
+
 struct ContentView: View {
     @StateObject private var viewModel = AppViewModel()
     
