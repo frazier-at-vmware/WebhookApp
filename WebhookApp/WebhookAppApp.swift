@@ -97,15 +97,22 @@ struct TemperatureRecordsView: View {
     var body: some View {
         NavigationView {
             List {
-                if let mostRecentRecord = viewModel.temperatures.last {
-                    Section(header: Text("Today")) {
-                        temperatureCard(for: mostRecentRecord)
+                if viewModel.temperatures.isEmpty {
+                    Section {
+                        Text("Please configure your Zip Code in Settings Tab.")
+                            .foregroundColor(.gray)
                     }
-                }
-                
-                Section(header: Text("Historical Temperatures")) {
-                    ForEach(viewModel.temperatures, id: \.id) { record in
-                        temperatureRow(for: record)
+                } else {
+                    if let mostRecentRecord = viewModel.temperatures.last {
+                        Section(header: Text("Today")) {
+                            temperatureCard(for: mostRecentRecord)
+                        }
+                    }
+                    
+                    Section(header: Text("Historical Temperatures")) {
+                        ForEach(viewModel.temperatures, id: \.id) { record in
+                            temperatureRow(for: record)
+                        }
                     }
                 }
             }
@@ -115,9 +122,6 @@ struct TemperatureRecordsView: View {
             viewModel.fetchTemperatures()
         }
     }
-    
-
-    
     
     private func temperatureCard(for record: TemperatureRecord) -> some View {
         VStack(alignment: .leading) {
