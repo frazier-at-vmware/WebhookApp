@@ -180,17 +180,18 @@ struct TemperatureRecordsView: View {
                     Section(header: Text("Location Settings")) {
                         TextField("Zip Code", text: $viewModel.zipCode)
                             .keyboardType(.numberPad)
-                        
-                        Button("Refresh") {
-                            viewModel.fetchTemperatures()
-                        }
+                            .dismissKeyboardOnTap()
                     }
                     
                     Section(header: Text("Temperature Color Ranges")) {
                         ForEach($viewModel.temperatureColorPreference.ranges) { $range in
                             HStack {
                                 TextField("Lower Bound", value: $range.lowerBound, formatter: NumberFormatter())
+                                    .keyboardType(.numberPad)
+                                    .dismissKeyboardOnTap()
                                 TextField("Upper Bound", value: $range.upperBound, formatter: NumberFormatter())
+                                    .keyboardType(.numberPad)
+                                    .dismissKeyboardOnTap()
                                 ColorPicker("", selection: $range.color)
                             }
                         }
@@ -315,6 +316,22 @@ extension NumberFormatter {
         return formatter
     }()
 }
+
+struct DismissKeyboardOnTap: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .onTapGesture {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
+    }
+}
+
+extension View {
+    func dismissKeyboardOnTap() -> some View {
+        self.modifier(DismissKeyboardOnTap())
+    }
+}
+
 
 @main
 struct WebhookApp: App {

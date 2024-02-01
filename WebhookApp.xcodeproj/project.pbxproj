@@ -16,7 +16,6 @@
 		6770F0112B6ADBA800FF6EF8 /* WebhookAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6770F0102B6ADBA800FF6EF8 /* WebhookAppUITestsLaunchTests.swift */; };
 		6770F01F2B6ADC4D00FF6EF8 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 6770F01E2B6ADC4D00FF6EF8 /* Alamofire */; };
 		6770F0212B6AF70600FF6EF8 /* TemperatureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6770F0202B6AF70600FF6EF8 /* TemperatureService.swift */; };
-		67843DDE2B6BFEF90007ED55 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 67843DDD2B6BFEF90007ED55 /* Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,7 +47,6 @@
 		6770F00E2B6ADBA800FF6EF8 /* WebhookAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookAppUITests.swift; sourceTree = "<group>"; };
 		6770F0102B6ADBA800FF6EF8 /* WebhookAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		6770F0202B6AF70600FF6EF8 /* TemperatureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemperatureService.swift; sourceTree = "<group>"; };
-		67843DDD2B6BFEF90007ED55 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,7 +98,6 @@
 		6770EFF22B6ADBA700FF6EF8 /* WebhookApp */ = {
 			isa = PBXGroup;
 			children = (
-				67843DDD2B6BFEF90007ED55 /* Info.plist */,
 				6770EFF32B6ADBA700FF6EF8 /* WebhookAppApp.swift */,
 				6770EFF52B6ADBA700FF6EF8 /* ContentView.swift */,
 				6770EFF72B6ADBA800FF6EF8 /* Assets.xcassets */,
@@ -247,7 +244,6 @@
 			files = (
 				6770EFFB2B6ADBA800FF6EF8 /* Preview Assets.xcassets in Resources */,
 				6770EFF82B6ADBA800FF6EF8 /* Assets.xcassets in Resources */,
-				67843DDE2B6BFEF90007ED55 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -369,6 +365,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				NEW_SETTING = "";
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
@@ -427,6 +424,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				NEW_SETTING = "";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
