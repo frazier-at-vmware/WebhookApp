@@ -28,7 +28,15 @@ class AppViewModel: ObservableObject {
         var color: Color
     }
     
-
+    func backgroundColor(for temperature: Double) -> Color {
+        for range in temperatureColorPreference.ranges {
+            if temperature >= range.lowerBound && temperature < range.upperBound {
+                return range.color
+            }
+        }
+        return .white // Default color if no range matches
+    }
+    
     func fetchTemperatures() {
         isLoading = true
         TemperatureService.shared.fetchTemperatures(forZip: zipCode) { [weak self] result in
@@ -108,14 +116,7 @@ struct TemperatureRecordsView: View {
         }
     }
     
-    func backgroundColor(for temperature: Double) -> Color {
-        for range in temperatureColorPreference.ranges {
-            if temperature >= range.lowerBound && temperature < range.upperBound {
-                return range.color
-            }
-        }
-        return .white // Default color if no range matches
-    }
+
     
     
     private func temperatureCard(for record: TemperatureRecord) -> some View {
@@ -137,7 +138,7 @@ struct TemperatureRecordsView: View {
         .frame(maxWidth: .infinity) // Fill the VStack horizontally
         .frame(maxHeight: .infinity)
         .padding()
-        .background(Color(backgroundColor(for: record.temp)))
+        .background(Color(viewModel.backgroundColor(for: record.temp)))
     }
     
     private func temperatureRow(for record: TemperatureRecord) -> some View {
@@ -158,7 +159,7 @@ struct TemperatureRecordsView: View {
             Text("\(record.temp, specifier: "%.1f")°F")
                 .fontWeight(.bold)
                 .padding(8)
-                .background(RoundedRectangle(cornerRadius: 10).fill(backgroundColor(for: record.temp)))
+                .background(RoundedRectangle(cornerRadius: 10).fill(viewModel.backgroundColor(for: record.temp)))
         }
     }
 }
@@ -232,7 +233,23 @@ struct TemperatureRecordsView: View {
         }
     }
 
+struct TemperatureQuiltView: View {
+    let temperatureColorPreference: AppViewModel.TemperatureColorPreference
+    @ObservedObject var viewModel: AppViewModel
 
+    var body: some View {
+        ScrollView {
+            VStack {
+                ForEach(viewModel.temperatures, id: \.id) { record in
+                    Rectangle()
+                        .fill(viewModel.backgroundColor(for: record.temp))
+                        .frame(height: 20)
+                }
+            }
+        }
+        .navigationTitle("Temperature Quilt")
+    }
+}
 
 struct ContentView: View {
     @StateObject private var viewModel = AppViewModel()
@@ -247,7 +264,7 @@ struct ContentView: View {
                 .tabItem {
                 Label("Settings", systemImage: "gear")
                 }
-            TemperatureQuiltView(viewModel: viewModel) // New tab for Temperature Quilt
+            TemperatureQuiltView(temperatureColorPreference: viewModel.temperatureColorPreference, viewModel: viewModel) // New tab for Temperature Quilt
                 .tabItem {
                     Label("Quilt", systemImage: "square.fill")
                 }
