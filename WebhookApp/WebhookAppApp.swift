@@ -172,6 +172,8 @@ struct TemperatureRecordsView: View {
 }
     
     struct SettingsView: View {
+        @State private var name = ""
+        @FocusState private var nameIsFocused: Bool
         @ObservedObject var viewModel: AppViewModel
         
         var body: some View {
@@ -180,18 +182,17 @@ struct TemperatureRecordsView: View {
                     Section(header: Text("Location Settings")) {
                         TextField("Zip Code", text: $viewModel.zipCode)
                             .keyboardType(.numberPad)
-                            .dismissKeyboardOnTap()
+                            .focused($nameIsFocused)
                     }
-                    
                     Section(header: Text("Temperature Color Ranges")) {
                         ForEach($viewModel.temperatureColorPreference.ranges) { $range in
                             HStack {
                                 TextField("Lower Bound", value: $range.lowerBound, formatter: NumberFormatter())
                                     .keyboardType(.numberPad)
-                                    .dismissKeyboardOnTap()
+                                    .focused($nameIsFocused)
                                 TextField("Upper Bound", value: $range.upperBound, formatter: NumberFormatter())
                                     .keyboardType(.numberPad)
-                                    .dismissKeyboardOnTap()
+                                    .focused($nameIsFocused)
                                 ColorPicker("", selection: $range.color)
                             }
                         }
@@ -228,6 +229,9 @@ struct TemperatureRecordsView: View {
                 .navigationTitle("Settings")
                 .toolbar {
                     EditButton()
+                }
+                .onTapGesture{
+                    nameIsFocused = false
                 }
             }
         }
@@ -319,10 +323,13 @@ extension NumberFormatter {
 
 struct DismissKeyboardOnTap: ViewModifier {
     func body(content: Content) -> some View {
-        content
-            .onTapGesture {
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-            }
+        ZStack {
+            content
+            Color.clear
+                .onTapGesture {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }
+        }
     }
 }
 
@@ -332,6 +339,13 @@ extension View {
     }
 }
 
+#if canImport(UIKit)
+extension View {
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+}
+#endif
 
 @main
 struct WebhookApp: App {
