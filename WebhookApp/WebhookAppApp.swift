@@ -96,6 +96,7 @@ struct TemperatureRecordsView: View {
         return .white // Default color if no range matches
     }
     }
+    @ObservedObject var viewModel: AppViewModel
     var body: some View {
         NavigationView {
             List {
