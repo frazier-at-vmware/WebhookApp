@@ -172,39 +172,30 @@ struct TemperatureRecordsView: View {
 }
     
     struct SettingsView: View {
-        @State private var name = ""
-        @FocusState private var nameIsFocused: Bool
+        @State private var isPresentingZipCodeAlert = false
+        @State private var isPresentingTemperatureColorRanges = false
+        @State private var tempZipCode = ""
         @ObservedObject var viewModel: AppViewModel
         
         var body: some View {
             NavigationView {
                 Form {
                     Section(header: Text("Location Settings")) {
-                        TextField("Zip Code", text: $viewModel.zipCode)
-                            .keyboardType(.numberPad)
-                            .focused($nameIsFocused)
+                        Button(action: {
+                            tempZipCode = viewModel.zipCode
+                            isPresentingZipCodeAlert = true
+                        }) {
+                            Text("Change Zip Code")
+                        }
                     }
                     Section(header: Text("Temperature Color Ranges")) {
-                        ForEach($viewModel.temperatureColorPreference.ranges) { $range in
-                            HStack {
-                                TextField("Lower Bound", value: $range.lowerBound, formatter: NumberFormatter())
-                                    .keyboardType(.numberPad)
-                                    .focused($nameIsFocused)
-                                TextField("Upper Bound", value: $range.upperBound, formatter: NumberFormatter())
-                                    .keyboardType(.numberPad)
-                                    .focused($nameIsFocused)
-                                ColorPicker("", selection: $range.color)
-                            }
-                        }
-                        .onDelete(perform: deleteRange)
-                        .onMove(perform: moveRange)
-                        
-                        Button("Add Range") {
-                            withAnimation {
-                                viewModel.temperatureColorPreference.ranges.append(AppViewModel.TemperatureRange(lowerBound: 0, upperBound: 10, color: .white))
-                            }
+                        Button(action: {
+                            isPresentingTemperatureColorRanges = true
+                        }) {
+                            Text("Edit Ranges")
                         }
                     }
+                    
                     
                     Section(header: Text("Knitting Settings")) {
                         Toggle("Show Knit/Pearl Suggestions", isOn: $viewModel.showKPTextBlock)
@@ -228,14 +219,105 @@ struct TemperatureRecordsView: View {
                 }
                 .navigationTitle("Settings")
                 .toolbar {
-                    EditButton()
                 }
-                .onTapGesture{
-                    nameIsFocused = false
+                .sheet(isPresented: $isPresentingZipCodeAlert) {
+                    NavigationView {
+                        VStack {
+                            Text("Zip Code")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .padding(.bottom, 20)
+                            
+                            Text("Enter your zip code below to retrieve the weather.")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .padding(.bottom, 20)
+                            
+                            TextField("Zip Code", text: $tempZipCode)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .padding(.bottom, 20)
+                                .keyboardType(.numberPad)
+                            
+                            Button("Save") {
+                                viewModel.zipCode = tempZipCode
+                                isPresentingZipCodeAlert = false
+                            }
+                            .padding(.top, 20)
+                        }
+                        .padding()
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button("Cancel") {
+                                    isPresentingZipCodeAlert = false
+                                }
+                            }
+                        }
+                    }
                 }
+
+                .sheet(isPresented: $isPresentingTemperatureColorRanges) {
+                    NavigationView {
+                        List {
+                            ForEach($viewModel.temperatureColorPreference.ranges) { $range in
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text("Low")
+                                            .font(.subheadline).bold()
+                                        TextField("Lower Bound", value: $range.lowerBound, formatter: NumberFormatter())
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                            .keyboardType(.numberPad)
+                                    }
+                                    .padding(.trailing)
+
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text("High")
+                                            .font(.subheadline).bold()
+                                        TextField("Upper Bound", value: $range.upperBound, formatter: NumberFormatter())
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                            .keyboardType(.numberPad)
+                                    }
+                                    .padding(.leading)
+
+                                    Spacer()
+                                    
+                                    ColorPicker("", selection: $range.color)
+                                        .labelsHidden()
+                                        .padding(.leading, 20)
+                                }
+                                .padding(.vertical)
+                            }
+                            .onDelete(perform: deleteRange)
+                            .onMove(perform: moveRange)
+                        }
+                        .listStyle(InsetGroupedListStyle())
+                        .navigationTitle("Blanket Colors")
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button("Exit") {
+                                    isPresentingTemperatureColorRanges = false
+                                }
+                            }
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                EditButton()
+                            }
+                            ToolbarItem(placement: .bottomBar) {
+                                Button(action: {
+                                    withAnimation {
+                                        viewModel.temperatureColorPreference.ranges.append(AppViewModel.TemperatureRange(lowerBound: 0, upperBound: 10, color: .white))
+                                    }
+                                }) {
+                                    Label("Add Range", systemImage: "plus")
+                                }
+                            }
+                        }
+                    }
+                    .padding() // Add padding here if needed, but it might be redundant with NavigationView and List styling.
+                }
+
+                
+              
             }
         }
-        
         private func deleteRange(at offsets: IndexSet) {
             viewModel.temperatureColorPreference.ranges.remove(atOffsets: offsets)
         }
@@ -244,6 +326,7 @@ struct TemperatureRecordsView: View {
             viewModel.temperatureColorPreference.ranges.move(fromOffsets: source, toOffset: destination)
         }
     }
+
 
 struct TemperatureQuiltView: View {
     let temperatureColorPreference: AppViewModel.TemperatureColorPreference
@@ -320,32 +403,6 @@ extension NumberFormatter {
         return formatter
     }()
 }
-
-struct DismissKeyboardOnTap: ViewModifier {
-    func body(content: Content) -> some View {
-        ZStack {
-            content
-            Color.clear
-                .onTapGesture {
-                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                }
-        }
-    }
-}
-
-extension View {
-    func dismissKeyboardOnTap() -> some View {
-        self.modifier(DismissKeyboardOnTap())
-    }
-}
-
-#if canImport(UIKit)
-extension View {
-    func hideKeyboard() {
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-    }
-}
-#endif
 
 @main
 struct WebhookApp: App {

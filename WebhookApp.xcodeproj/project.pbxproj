@@ -98,6 +98,9 @@
 		6770EFF22B6ADBA700FF6EF8 /* WebhookApp */ = {
 			isa = PBXGroup;
 			children = (
+				67843DE12B6C28400007ED55 /* Helpers */,
+				67843DE02B6C28350007ED55 /* Views */,
+				67843DDF2B6C282C0007ED55 /* Model */,
 				6770EFF32B6ADBA700FF6EF8 /* WebhookAppApp.swift */,
 				6770EFF52B6ADBA700FF6EF8 /* ContentView.swift */,
 				6770EFF72B6ADBA800FF6EF8 /* Assets.xcassets */,
@@ -130,6 +133,27 @@
 				6770F0102B6ADBA800FF6EF8 /* WebhookAppUITestsLaunchTests.swift */,
 			);
 			path = WebhookAppUITests;
+			sourceTree = "<group>";
+		};
+		67843DDF2B6C282C0007ED55 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		67843DE02B6C28350007ED55 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		67843DE12B6C28400007ED55 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
