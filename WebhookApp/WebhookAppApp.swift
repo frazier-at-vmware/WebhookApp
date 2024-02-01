@@ -153,7 +153,7 @@ struct TemperatureRecordsView: View {
                 .background(RoundedRectangle(cornerRadius: 10).fill(backgroundColor(for: record.temp)))
         }
     }
-    
+}
     
     struct SettingsView: View {
         @ObservedObject var viewModel: AppViewModel
@@ -223,8 +223,8 @@ struct TemperatureRecordsView: View {
             viewModel.temperatureColorPreference.ranges.move(fromOffsets: source, toOffset: destination)
         }
     }
-    
-}
+
+
 
 struct ContentView: View {
     @StateObject private var viewModel = AppViewModel()
