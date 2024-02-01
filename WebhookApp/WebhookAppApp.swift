@@ -86,17 +86,6 @@ struct TemperatureRecordsView: View {
     @ObservedObject var viewModel: AppViewModel
     let temperatureColorPreference: AppViewModel.TemperatureColorPreference
     
-    
-    func backgroundColor(for temperature: Double) -> Color {
-        for range in temperatureColorPreference.ranges {
-            if temperature >= range.lowerBound && temperature < range.upperBound {
-                return range.color
-            }
-        }
-        return .white // Default color if no range matches
-    }
-    }
-    @ObservedObject var viewModel: AppViewModel
     var body: some View {
         NavigationView {
             List {
@@ -118,6 +107,16 @@ struct TemperatureRecordsView: View {
             viewModel.fetchTemperatures()
         }
     }
+    
+    func backgroundColor(for temperature: Double) -> Color {
+        for range in temperatureColorPreference.ranges {
+            if temperature >= range.lowerBound && temperature < range.upperBound {
+                return range.color
+            }
+        }
+        return .white // Default color if no range matches
+    }
+    
     
     private func temperatureCard(for record: TemperatureRecord) -> some View {
         VStack(alignment: .leading) {
