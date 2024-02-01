@@ -19,16 +19,14 @@ class AppViewModel: ObservableObject {
         // Existing initialization...
     }
     struct TemperatureColorPreference {
-        var zeroToTen: Color = .gray
-        var tenToTwenty: Color = .mint
-        var twentyToThirty: Color = .blue
-        var thirtyToForty: Color = .cyan
-        var fortyToFifty: Color = .green
-        var fiftyToSixty: Color = .yellow
-        var sixtyToSeventy: Color = .orange
-        var seventyToEighty: Color = .pink
-        var eightyToNinety: Color = .red
-        var ninetyToHundred: Color = .purple
+        var ranges: [TemperatureRange] = []
+    }
+    struct TemperatureRange: Identifiable {
+        var id = UUID()
+        var lowerBound: Double
+        var upperBound: Double
+        var color: Color
+    }
     }
 
     func fetchTemperatures() {
@@ -90,19 +88,13 @@ struct TemperatureRecordsView: View {
     
     
     func backgroundColor(for temperature: Double) -> Color {
-        switch temperature {
-        case 0..<10: return temperatureColorPreference.zeroToTen
-        case 10..<20: return temperatureColorPreference.tenToTwenty
-        case 20..<30: return temperatureColorPreference.twentyToThirty
-        case 30..<40: return temperatureColorPreference.thirtyToForty
-        case 40..<50: return temperatureColorPreference.fortyToFifty
-        case 50..<60: return temperatureColorPreference.fiftyToSixty
-        case 60..<70: return temperatureColorPreference.sixtyToSeventy
-        case 70..<80: return temperatureColorPreference.seventyToEighty
-        case 80..<90: return temperatureColorPreference.eightyToNinety
-        case 90..<120: return temperatureColorPreference.ninetyToHundred
-        default: return .white
+        for range in temperatureColorPreference.ranges {
+            if temperature >= range.lowerBound && temperature < range.upperBound {
+                return range.color
+            }
         }
+        return .white // Default color if no range matches
+    }
     }
     var body: some View {
         NavigationView {
@@ -161,7 +153,7 @@ struct TemperatureRecordsView: View {
                 .background(RoundedRectangle(cornerRadius: 10).fill(backgroundColor(for: record.temp)))
         }
     }
-}
+
 
 struct SettingsView: View {
     @ObservedObject var viewModel: AppViewModel
@@ -177,22 +169,29 @@ struct SettingsView: View {
                         viewModel.fetchTemperatures()
                     }
                 }
-                Section(header: Text("Color Settings for Temperatures")) {
-                    ColorPicker("0-9", selection: $viewModel.temperatureColorPreference.zeroToTen)
-                    ColorPicker("10-19", selection: $viewModel.temperatureColorPreference.tenToTwenty)
-                    ColorPicker("20-29", selection: $viewModel.temperatureColorPreference.twentyToThirty)
-                    ColorPicker("30-39", selection: $viewModel.temperatureColorPreference.thirtyToForty)
-                    ColorPicker("40-49", selection: $viewModel.temperatureColorPreference.fortyToFifty)
-                    ColorPicker("50-59", selection: $viewModel.temperatureColorPreference.fiftyToSixty)
-                    ColorPicker("60-69", selection: $viewModel.temperatureColorPreference.sixtyToSeventy)
-                    ColorPicker("70-79", selection: $viewModel.temperatureColorPreference.seventyToEighty)
-                    ColorPicker("80-89", selection: $viewModel.temperatureColorPreference.eightyToNinety)
-                    ColorPicker("90-100+", selection: $viewModel.temperatureColorPreference.ninetyToHundred)
                 
+                Section(header: Text("Temperature Color Ranges")) {
+                    ForEach($viewModel.temperatureColorPreference.ranges) { $range in
+                        HStack {
+                            TextField("Lower Bound", value: $range.lowerBound, formatter: NumberFormatter())
+                            TextField("Upper Bound", value: $range.upperBound, formatter: NumberFormatter())
+                            ColorPicker("", selection: $range.color)
+                        }
+                    }
+                    .onDelete(perform: deleteRange)
+                    .onMove(perform: moveRange)
+                    
+                    Button("Add Range") {
+                        withAnimation {
+                            viewModel.temperatureColorPreference.ranges.append(TemperatureRange(lowerBound: 0, upperBound: 10, color: .white))
+                        }
+                    }
                 }
+                
                 Section(header: Text("Knitting Settings")) {
                     Toggle("Show Knit/Pearl Suggestions", isOn: $viewModel.showKPTextBlock)
                 }
+                
                 Section(header: Text("Notification Settings")) {
                     DatePicker("Reminder Time", selection: $viewModel.reminderTime, displayedComponents: .hourAndMinute)
                         .onChange(of: viewModel.reminderTime) { newValue in
@@ -207,28 +206,23 @@ struct SettingsView: View {
                             }
                         }
                     }
-                    Button("Schedule Notification") {
-                        let content = UNMutableNotificationContent()
-                        content.title = "Knit Your Row"
-                        content.subtitle = "A row a day keeps the doctor away."
-                        content.sound = UNNotificationSound.default
-
-                        // show this notification five seconds from now
-                        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-
-                        // choose a random identifier
-                        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
-
-                        // add our notification request
-                        UNUserNotificationCenter.current().add(request)
-                    }
-
                 }
             }
-            }
             .navigationTitle("Settings")
+            .toolbar {
+                EditButton()
+            }
         }
     }
+    
+    private func deleteRange(at offsets: IndexSet) {
+        viewModel.temperatureColorPreference.ranges.remove(atOffsets: offsets)
+    }
+    
+    private func moveRange(from source: IndexSet, to destination: Int) {
+        viewModel.temperatureColorPreference.ranges.move(fromOffsets: source, toOffset: destination)
+    }
+}
 
 
 struct ContentView: View {
